@@ -11,11 +11,9 @@ textData <- R6Class("textData",
                     ),
                     public = list(
                             # fileMode : if "file" then theData = filename, else theData = actual data
-                            # inMemory : only use together with fileMode == TRUE. if TRUE data gets all
-                            #            loaded into the object, otherwise not 
-                            initialize = function(theData, fileMode = TRUE, inMemory = FALSE,...){
+                            initialize = function(theData, fileMode = TRUE, ...){
                                     if (fileMode){
-                                            self$loadFile(theData, inMemory = inMemory)
+                                            self$loadFile(theData, ...)
                                     } else {
                                             # dataFile remains NA
                                             private$allLines = theData
@@ -23,12 +21,10 @@ textData <- R6Class("textData",
                               invisible(self)
                             },
                             # load all (text) data into the private allLines variable
-                            loadFile = function(fileName, inMemory = FALSE){
+                            loadFile = function(fileName){
                                     if (!is.na(fileName)){
                                             private$dataFile <- fileName
-                                            if (inMemory) {
-                                                    private$allLines <- readLines(private$dataFile, n = -1)
-                                            }
+                                            private$allLines <- readLines(private$dataFile, n = -1)
                                     } # else do nothing!
                               invisible(self)
                             },
@@ -61,25 +57,12 @@ textData <- R6Class("textData",
                             }
                     ),
                     active = list(
-                            # display if the lines of the text file are in memory
-                            inMemory = function(value){
-                                    if (missing(value)){
-                                            return(!identical(private$allLines,NA))
-                                    } else {
-                                            # nothing, read-only!
-                                    }
-                            },
                             # in case access is needed to the original (text) data
-                            # cannot change data via this!!
                             rawData = function(value){
                                     if (missing(value)){
-                                            if (self$inMemory){
-                                                    return(private$allLines)
-                                            } else {
-                                                    return(readLines(private$dataFile, n = -1))
-                                            }
+                                      return(private$allLines)
                                     } else {
-                                            # nothing, read-only!
+                                      private$allLines <- value
                                     }
                             },
                             # to get the name of the file containing the mascot data
@@ -88,20 +71,15 @@ textData <- R6Class("textData",
                                     if (missing(value)){
                                             return(private$dataFile)
                                     } else {
-                                            # nothing, read-only!
+                                            private$dataFile <- value
                                     }
                             },
                             # get the length = number of lines of (text) data
                             length = function(value){
                                     if (missing(value)){
-                                            if (self$inMemory){
-                                                    return(length(private$allLines))
-                                            } else {
-                                                    tempLines <- readLines(private$dataFile, n = -1)
-                                                    return(length(tempLines))
-                                            }
+                                      return(length(private$allLines))
                                     } else {
-                                            # nothing, read-only!
+                                      # do nothing
                                     }
                             }
                     )
