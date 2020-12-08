@@ -21,6 +21,10 @@ textData <- R6Class("textData",
                                     }
                               invisible(self)
                             },
+                            # catch print
+                            print = function(...){
+                              base::print(private$allLines)
+                            },
                             # load all (text) data into the private allLines variable
                             loadFile = function(fileName, ...){
                                     if (!is.na(fileName)){
