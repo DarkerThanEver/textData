@@ -11,6 +11,7 @@ textData <- R6Class("textData",
                     ),
                     public = list(
                             # fileMode : if "file" then theData = filename, else theData = actual data
+                            # Note: use ... to pass on arguments to readLines, such as 'warn = FALSE' 
                             initialize = function(theData, fileMode = TRUE, ...){
                                     if (fileMode){
                                             self$loadFile(theData, ...)
@@ -21,15 +22,16 @@ textData <- R6Class("textData",
                               invisible(self)
                             },
                             # load all (text) data into the private allLines variable
-                            loadFile = function(fileName){
+                            loadFile = function(fileName, ...){
                                     if (!is.na(fileName)){
                                             private$dataFile <- fileName
-                                            private$allLines <- readLines(private$dataFile, n = -1)
+                                            private$allLines <- readLines(private$dataFile, ...)
                                     } # else do nothing!
                               invisible(self)
                             },
                             # save all (text) data to a file
-                            saveFile = function(fileName = NA, theData = NA){
+                            # Note: ... can be used to pass on arguments to writeLines(), such as 'sep = ...' 
+                            saveFile = function(fileName = NA, theData = NA, ...){
                                     if (is.na(fileName)){
                                             aFile <- file(private$dataFile, open = "w")
                                     } else {
@@ -39,14 +41,9 @@ textData <- R6Class("textData",
                                             }
                                     }
                                     if (identical(theData,NA)){
-                                            if (self$inMemory){
-                                                    writeLines(private$allLines,aFile)
-                                            } else {
-                                                    tempLines <- eadLines(private$dataFile, n = -1)
-                                                    writeLines(tempLines,aFile)
-                                            }
+                                      writeLines(text = private$allLines,aFile, ...)
                                     } else {
-                                            writeLines(theData,aFile)
+                                      writeLines(text = theData, aFile, ...)
                                     }
                                     close(aFile)
                             },
